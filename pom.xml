@@ -1,0 +1,262 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.cloudapp.cnr-seas.scp</groupId>
+    <artifactId>CNR-SmartChargingProvider</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+
+
+    <name>CNR pilot SmartChargingProvider</name>
+    <description>The source of CNR Electric Vehicle Smart Charging Provider pilot web API, http://cnr-seas.cloudapp.net/scp/</description>
+    <url>http://cnr-seas.cloudapp.net/scp/</url>
+    <inceptionYear>2016</inceptionYear>
+    
+    <developers>
+        <developer>
+            <name>Maxime Lefran�ois</name>
+            <email>maxime.lefrancois.86@gmail.com</email>
+            <url>http://maxime-lefrancois.info/</url>
+            <organization>Ecole des mines de Saint-Etienne</organization>
+            <organizationUrl>http://www.mines-stetienne.fr/</organizationUrl>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>ITEA 12004 SEAS Project</name>
+        <url>https://itea3.org/project/seas.html</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.7</jdk.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
+    </properties>
+    
+    <profiles>
+        <profile>
+            <!-- Turn of doclint for java8 and later -->
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.3</version>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
+    
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.w3id.spargl</groupId>
+            <artifactId>spargl-jena</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>azure-servicebus</artifactId>
+            <version>0.9.3</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <version>true</version>
+                        <show>public</show>
+                        <quiet>true</quiet>
+                        <encoding>UTF-8</encoding>
+                        <windowtitle>${project.name} ${project.version}</windowtitle>
+                        <doctitle>${project.name} ${project.version}</doctitle>
+                        <bottom>Licensed under the Apache License, Version 2.0</bottom>
+                        <links>
+                            <link>http://w3id.org/spargl/spargl-jena/javadoc/</link>
+                        </links>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <!-- Run the RAT Plugin -->
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <version>0.11</version>
+                <executions>
+                    <execution>
+                        <id>rat-checks</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludeSubProjects>true</excludeSubProjects>
+                    <excludes>
+                        <!--
+                        Javadoc add-ons files are required to be simple and our javadoc configuration
+                        will ensure appropriate license and copyright statements are inserted
+                        into generated documentation anyway so no need to put license statements in these
+                        files
+                        -->
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*.properties</exclude>
+                        <exclude>**/*.wsdl</exclude>
+                        <exclude>**/*.jsp</exclude>
+                        <!--
+                        Text and Markdown files are typically used only for documentation purposes
+                        and license declarations are usually spurious in these files since often they
+                        will refer to the LICENSE/NOTICE for users to find the actual licenses
+                        -->
+                        <exclude>**/*.txt</exclude>
+                        <exclude>**/*.md</exclude>
+                        <exclude>**/nbproject/*</exclude>
+                        <exclude>**/log4j.properties</exclude>
+                        <exclude>**/log4j-testing.properties</exclude>
+                        <!-- Cached classpath for commands - autogenerated -->
+                        <exclude>**/*.classpath</exclude>
+                        <!-- Exclude anything created during the build (plugin generated files) ->-->
+                        <exclude>**/target/**/*</exclude>
+                        <!-- MSHADE-124 -->
+                        <exclude>**/dependency-reduced-pom.xml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- usage of jax-ws maven plugin--> 
+            <plugin> 
+                <groupId>org.codehaus.mojo</groupId> 
+                <artifactId>jaxws-maven-plugin</artifactId> 
+                <version>2.4.1</version> 
+                <executions> 
+                    <execution> 
+                        <id>wsimport-from-jdk</id> 
+                        <goals> 
+                            <goal>wsimport</goal> 
+                        </goals> 
+                    </execution> 
+                </executions> 
+                <configuration> <!--wsdls file directory --> 
+                    <wsdlDirectory>src/main/resources/wsdls</wsdlDirectory> <!-- which wsdl file --> 
+                    <wsdlFiles> 
+                        <wsdlFile>SmartCharging.wsdl</wsdlFile> 
+                    </wsdlFiles> <!-- Keep generated files --> 
+                    <keep>true</keep> <!-- Package name --> 
+                    <packageName>com.thesmartenergy.cnr.skeleton</packageName> <!-- generated source files destination--> 
+                    <sourceDestDir>target/generated-code/src</sourceDestDir> 
+                </configuration> 
+            </plugin> <!-- adding generated source --> 
+            <plugin> 
+                <groupId>org.codehaus.mojo</groupId> 
+                <artifactId>build-helper-maven-plugin</artifactId> 
+                <version>1.10</version>
+                <executions> 
+                    <execution> 
+                        <id>add-source</id> 
+                        <phase>generate-sources</phase> 
+                        <goals> 
+                            <goal>add-source</goal> 
+                        </goals> 
+                        <configuration> 
+                            <sources> 
+                                <source>target/generated-code/src</source> 
+                            </sources> 
+                        </configuration> 
+                    </execution> 
+                </executions> 
+            </plugin>            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <compilerArguments>
+                        <endorseddirs>${endorsed.dir}</endorseddirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${endorsed.dir}</outputDirectory>
+                            <silent>true</silent>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax</groupId>
+                                    <artifactId>javaee-endorsed-api</artifactId>
+                                    <version>6.0</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
