@@ -1,2 +1,167 @@
 # CNR-SmartChargingProvider
+
 The source of CNR Electric Vehicle Smart Charging Provider pilot web API, http://cnr-seas.cloudapp.net/scp/
+
+This API defines only two operations. For now, these operations consume or produce XML as described below. In the next release, the operations will also be able to consume or produce RDF, in conformance with the SEAS knowledge model. SPARQL-Generate protocol will be used to describe how RDF may be generated from XML.
+
++ `POST </scp/rest/ChargeOptimizationRequest>`: with HTTP header field `Content-type: application/xml`, and HTTP body represents a charge need (see below, and see the schema in the wsdl file on github). Then the server returns a `202 Accepted`, with HTTP Response field `Location` that describes where the response will be located, and a HTTP Response field `Promise-Delay` that describes the delay (in ms) before the server believes the response will be available.
+
+```
+<GetChargingPlans xmlns="http://cnr-seas.cloudapp.net/scp/">
+    <value xmlns:d4p1="http://schemas.datacontract.org/2004/07/SIGE.WCF" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+        <d4p1:ChargeNeeds>
+            <d4p1:ChargeNeed>
+                <d4p1:DateReprise>2016-03-10T20:00:00.000Z</d4p1:DateReprise>
+                <d4p1:Energie>20</d4p1:Energie>
+                <d4p1:IdCharge>1</d4p1:IdCharge>
+                <d4p1:MargeDuree>0</d4p1:MargeDuree>
+                <d4p1:MargeEnergie>0</d4p1:MargeEnergie>
+                <d4p1:PMax>4</d4p1:PMax>
+                <d4p1:PMin>3</d4p1:PMin>
+                <d4p1:Priorite>0</d4p1:Priorite>
+                <d4p1:TypeCharge>Planifiee</d4p1:TypeCharge>
+            </d4p1:ChargeNeed>
+        </d4p1:ChargeNeeds>
+        <d4p1:OptimisationPmaxSite>10</d4p1:OptimisationPmaxSite>
+    </value>
+</GetChargingPlans>
+```
+
++ `GET </scp/ChargingPlan/{id}>`: with HTTP header field `Accept: application/xml`. Then if the server returns a `200 OK`, the HTTP body represents the response charging plan (see below, and see the schema in the wsdl file on github). If the server returns a 202 Accepted, then the server did not finish processing the charge optimization. HTTP Response field `Promise-Delay` describes the delay (in ms) before the server believes the response will be available.
+
+```
+<ns2:GetChargingPlansResponse xmlns="http://schemas.datacontract.org/2004/07/SIGE.WCF" xmlns:ns2="http://cnr-seas.cloudapp.net/scp/" xmlns:ns3="http://schemas.microsoft.com/2003/10/Serialization/">
+    <ns2:GetChargingPlansResult>
+        <ChargingPlan>
+            <IdCharge>1</IdCharge>
+            <Orders>
+                <Order>
+                    <DateDebut>2016-03-03T07:00:00</DateDebut>
+                    <DateFin>2016-03-03T08:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T08:00:00</DateDebut>
+                    <DateFin>2016-03-03T09:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T09:00:00</DateDebut>
+                    <DateFin>2016-03-03T10:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T10:00:00</DateDebut>
+                    <DateFin>2016-03-03T11:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T11:00:00</DateDebut>
+                    <DateFin>2016-03-03T12:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T12:00:00</DateDebut>
+                    <DateFin>2016-03-03T13:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T13:00:00</DateDebut>
+                    <DateFin>2016-03-03T14:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T14:00:00</DateDebut>
+                    <DateFin>2016-03-03T15:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T15:00:00</DateDebut>
+                    <DateFin>2016-03-03T16:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T16:00:00</DateDebut>
+                    <DateFin>2016-03-03T17:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T17:00:00</DateDebut>
+                    <DateFin>2016-03-03T18:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T18:00:00</DateDebut>
+                    <DateFin>2016-03-03T19:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T19:00:00</DateDebut>
+                    <DateFin>2016-03-03T20:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T20:00:00</DateDebut>
+                    <DateFin>2016-03-03T21:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T21:00:00</DateDebut>
+                    <DateFin>2016-03-03T22:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T22:00:00</DateDebut>
+                    <DateFin>2016-03-03T23:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-03T23:00:00</DateDebut>
+                    <DateFin>2016-03-04T00:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T00:00:00</DateDebut>
+                    <DateFin>2016-03-04T01:00:00</DateFin>
+                    <Puissance>4</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T01:00:00</DateDebut>
+                    <DateFin>2016-03-04T02:00:00</DateFin>
+                    <Puissance>4</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T02:00:00</DateDebut>
+                    <DateFin>2016-03-04T03:00:00</DateFin>
+                    <Puissance>4</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T03:00:00</DateDebut>
+                    <DateFin>2016-03-04T04:00:00</DateFin>
+                    <Puissance>4</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T04:00:00</DateDebut>
+                    <DateFin>2016-03-04T05:00:00</DateFin>
+                    <Puissance>4</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T05:00:00</DateDebut>
+                    <DateFin>2016-03-04T06:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T06:00:00</DateDebut>
+                    <DateFin>2016-03-04T07:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+                <Order>
+                    <DateDebut>2016-03-04T07:00:00</DateDebut>
+                    <DateFin>2016-03-04T08:00:00</DateFin>
+                    <Puissance>0</Puissance>
+                </Order>
+            </Orders>
+        </ChargingPlan>
+    </ns2:GetChargingPlansResult>
+</ns2:GetChargingPlansResponse>
+```
