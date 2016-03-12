@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>CNR API</title>
+    </head>
+    <body>
+        <h1>CNR Smart Charging Provider</h1>
+        <p>This API defines only two operations. For now, these operations consume or produce XML as described below. In the next release, the operations will also be able to consume or produce RDF, in conformance with the SEAS knowledge model. <a href="http://thesmartenergy.github.io/sparql-generate-jena">SPARQL-Generate protocol</a> will be used to describe how RDF may be generated from XML.</p>
+        <ul>
+            <li><code>POST &lt;/scp/rest/ChargeOptimizationRequest&gt;</code>: with HTTP header field <code>Content-type: application/xml</code>, and HTTP body represents a charge need (see below, and see the schema in the <a href="https://github.com/thesmartenergy/CNR-SmartChargingProvider/blob/master/src/main/resources/wsdls/SmartCharging.wsdl">wsdl file on github</a>). Then the server returns a 202 Accepted, with HTTP Response field <code>Location</code> that describes where the response will be located, and a HTTP Response field <code>Promise-Delay</code> that describes the delay (in ms) before the server believez the response will be available.
+                <pre>&lt;GetChargingPlans xmlns="http://cnr-seas.cloudapp.net/scp/">
+    &lt;value xmlns:d4p1="http://schemas.datacontract.org/2004/07/SIGE.WCF" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+        &lt;d4p1:ChargeNeeds>
+            &lt;d4p1:ChargeNeed>
+                &lt;d4p1:DateReprise>2016-03-10T20:00:00.000Z&lt;/d4p1:DateReprise>
+                &lt;d4p1:Energie>20&lt;/d4p1:Energie>
+                &lt;d4p1:IdCharge>1&lt;/d4p1:IdCharge>
+                &lt;d4p1:MargeDuree>0&lt;/d4p1:MargeDuree>
+                &lt;d4p1:MargeEnergie>0&lt;/d4p1:MargeEnergie>
+                &lt;d4p1:PMax>4&lt;/d4p1:PMax>
+                &lt;d4p1:PMin>3&lt;/d4p1:PMin>
+                &lt;d4p1:Priorite>0&lt;/d4p1:Priorite>
+                &lt;d4p1:TypeCharge>Planifiee&lt;/d4p1:TypeCharge>
+            &lt;/d4p1:ChargeNeed>
+        &lt;/d4p1:ChargeNeeds>
+        &lt;d4p1:OptimisationPmaxSite>10&lt;/d4p1:OptimisationPmaxSite>
+    &lt;/value>
+&lt;/GetChargingPlans></pre></li>
+            <li><code>GET &lt;/scp/ChargingPlan/{id}&gt;</code>: with HTTP header field <code>Accept: application/xml</code>. Then if the server returns a 200 OK, the HTTP body represents the response charging plan (see below, and see the schema in the <a href="https://github.com/thesmartenergy/CNR-SmartChargingProvider/blob/master/src/main/resources/wsdls/SmartCharging.wsdl">wsdl file on github</a>). If the server returns a 202 Accepted, then the server did not finish processing the charge optimization. HTTP Response field <code>Promise-Delay</code> describes the delay (in ms) before the server believez the response will be available.
+                <pre>&lt;ns2:GetChargingPlansResponse xmlns="http://schemas.datacontract.org/2004/07/SIGE.WCF" xmlns:ns2="http://cnr-seas.cloudapp.net/scp/" xmlns:ns3="http://schemas.microsoft.com/2003/10/Serialization/">
+    &lt;ns2:GetChargingPlansResult>
+        &lt;ChargingPlan>
+            &lt;IdCharge>1&lt;/IdCharge>
+            &lt;Orders>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T07:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T08:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T08:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T09:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T09:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T10:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T10:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T11:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T11:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T12:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T12:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T13:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T13:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T14:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T14:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T15:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T15:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T16:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T16:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T17:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T17:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T18:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T18:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T19:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T19:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T20:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T20:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T21:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T21:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T22:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T22:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-03T23:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-03T23:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T00:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T00:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T01:00:00&lt;/DateFin>
+                    &lt;Puissance>4&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T01:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T02:00:00&lt;/DateFin>
+                    &lt;Puissance>4&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T02:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T03:00:00&lt;/DateFin>
+                    &lt;Puissance>4&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T03:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T04:00:00&lt;/DateFin>
+                    &lt;Puissance>4&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T04:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T05:00:00&lt;/DateFin>
+                    &lt;Puissance>4&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T05:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T06:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T06:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T07:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+                &lt;Order>
+                    &lt;DateDebut>2016-03-04T07:00:00&lt;/DateDebut>
+                    &lt;DateFin>2016-03-04T08:00:00&lt;/DateFin>
+                    &lt;Puissance>0&lt;/Puissance>
+                
+                &lt;/Order>
+            
+            &lt;/Orders>
+        
+        &lt;/ChargingPlan>
+    
+    &lt;/ns2:GetChargingPlansResult>
+&lt;/ns2:GetChargingPlansResponse></pre></li>
+        </ul>
+    </body>
+</html>

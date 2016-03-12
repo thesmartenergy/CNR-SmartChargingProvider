@@ -15,125 +15,87 @@
  */
 package com.thesmartenergy.cnr.scp;
 
-import com.microsoft.windowsazure.Configuration;
 import com.microsoft.windowsazure.exception.ServiceException;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveMessageOptions;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveMode;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveQueueMessageResult;
-import com.thesmartenergy.cnr.Request;
-import com.thesmartenergy.cnr.RequestController;
-import com.thesmartenergy.cnr.skeleton.ArrayOfKeyValueOfintArrayOfOrderJORfzFnK;
+import com.thesmartenergy.cnr.CNRException;
+import com.thesmartenergy.cnr.Subscribe;
+import com.thesmartenergy.cnr.entities.Request;
+import com.thesmartenergy.cnr.entities.RequestController;
+import com.thesmartenergy.cnr.skeleton.GetChargingPlansResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBException;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 
 /**
  *
  * @author maxime.lefrancois
  */
-@WebListener
-public class ChargingPlanSubscriber implements ServletContextListener {
-
-    private final String connectionUri, queueName;
-    private final ServiceBusContract service;
-    private ExecutorService executor;
-
-    private ChargingPlanSubscriber() throws IOException {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        InputStream input = classLoader.getResourceAsStream("conf.properties");
-        Properties properties = new Properties();
-        properties.load(input);
-
-        connectionUri = properties.getProperty("subscribePlanConnection");
-        queueName = properties.getProperty("subscribePlanQueue");
-        Configuration config = new Configuration();
-        ServiceBusConfiguration.configureWithConnectionString(null, config, connectionUri);
-        service = ServiceBusService.create(config);
+public class ChargingPlanSubscriber implements Runnable {
+    
+    final static ReceiveMessageOptions opts = ReceiveMessageOptions.DEFAULT;
+    static {
+        opts.setReceiveMode(ReceiveMode.PEEK_LOCK);
     }
+
+    @Inject
+    private Logger log;
+
+    @Inject
+    @Subscribe
+    private ServiceBusContract service;
+
+    @Inject
+    @Subscribe
+    private String queue;
+
+    @Inject
+    private RequestController controller;
 
     @Override
-    public void contextInitialized(ServletContextEvent arg0) {
-        ServletContext context = arg0.getServletContext();
-        executor = Executors.newFixedThreadPool(10);
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        ReceiveMessageOptions opts = ReceiveMessageOptions.DEFAULT;
-                        opts.setReceiveMode(ReceiveMode.PEEK_LOCK);
-                        ReceiveQueueMessageResult result = service.receiveQueueMessage(queueName, opts);
-                        executor.execute(new Worker(result));
-                    } catch (ServiceException ex) {
-                        Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
-        ServletContext context = arg0.getServletContext();
-        executor.shutdownNow();
-    }
-
-    private class Worker implements Runnable {
-
-        private final ReceiveQueueMessageResult result;
-
-        public Worker(ReceiveQueueMessageResult result) {
-            this.result = result;
-        }
-
-        @Override
-        public void run() {
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
+                ReceiveQueueMessageResult result = service.receiveQueueMessage(queue, opts);
                 BrokeredMessage message = result.getValue();
-                if (message != null && message.getMessageId() != null) {
+                
+                // SCP response
+                String id = message.getMessageId();
+                log.info("received response " + id);
+                InputStream body = message.getBody();
 
-                    // SCP response 
-                    String id = message.getMessageId();
-                    InputStream body = message.getBody();
-                    ArrayOfKeyValueOfintArrayOfOrderJORfzFnK response = JAXB.unmarshal(body, ArrayOfKeyValueOfintArrayOfOrderJORfzFnK.class);
+                SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null, body);
 
-                    // Delete message from queue
-                    service.deleteMessage(message);
+                GetChargingPlansResponse response = JAXB.unmarshal(body, GetChargingPlansResponse.class);
 
-                    // Get original request
-                    RequestController controller = RequestController.get();
-                    Request request = controller.find(id);
+                // Delete message from queue
+                service.deleteMessage(message);
+                // Get original request
+                Request request = controller.find(id);
 
-                    // Edit request object
-                    Request newRequest = new Request(request.getId(), request.getRequestDate(), request.getOptimizationRequestSeas(), new Date(), response);
-                    controller.edit(newRequest);
+                // Edit request object
+                Request newRequest = new Request(request.getId(), request.getRequestDate(), request.getGetChargingPlans(), new Date(), response);
 
-                } else {
-                    System.out.println("Did not receive messages.");
-                }
-            } catch (ServiceException ex) {
-                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (JAXBException ex) {
-                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
+                controller.edit(newRequest);
+
+            } catch (SOAPException | ServiceException | IOException | CNRException | NullPointerException ex) {
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
         }
     }

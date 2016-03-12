@@ -15,61 +15,76 @@
  */
 package com.thesmartenergy.cnr.scp;
 
-import com.microsoft.windowsazure.Configuration;
 import com.microsoft.windowsazure.exception.ServiceException;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
-import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
 import com.microsoft.windowsazure.services.servicebus.models.BrokeredMessage;
-import com.thesmartenergy.cnr.skeleton.OptimizationRequestSeas;
+import com.thesmartenergy.cnr.CNRException;
+import com.thesmartenergy.cnr.Publish;
+import com.thesmartenergy.cnr.skeleton.GetChargingPlans;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.Properties;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeaderElement;
+import javax.xml.soap.SOAPMessage;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
 
 /**
  *
  * @author maxime.lefrancois
  */
+@Dependent
 public class ChargeOptimizationRequestPublisher {
 
-    static private ChargeOptimizationRequestPublisher instance;
+    @Inject
+    @Publish
+    String queue;
 
-    static public ChargeOptimizationRequestPublisher get() throws IOException {
-        if (instance == null) {
-            instance = new ChargeOptimizationRequestPublisher();
+    @Inject
+    @Publish
+    ServiceBusContract service;
+
+    public void publish(String id, GetChargingPlans value) throws CNRException {
+        try {
+            // embed value in a SOAP envelope
+            SOAPMessage soapMessage = createSoapMessage(value);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            soapMessage.writeTo(out);
+            InputStream in = new ByteArrayInputStream(out.toByteArray());
+            BrokeredMessage message = new BrokeredMessage(in);
+            message.setMessageId(id);
+            service.sendQueueMessage(queue, message);
+        } catch (CNRException | ServiceException | SOAPException | IOException ex) {
+            throw new CNRException(ex);
         }
-        return instance;
-    }
-    
-    private final String connectionUri, queueName;
-    private final ServiceBusContract service;
-
-    private ChargeOptimizationRequestPublisher() throws IOException {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        InputStream input = classLoader.getResourceAsStream("conf.properties");
-        Properties properties = new Properties();
-        properties.load(input);
-
-        connectionUri = properties.getProperty("publishRequestConnection");
-        queueName = properties.getProperty("publishRequestQueue");
-        Configuration config = new Configuration();
-        ServiceBusConfiguration.configureWithConnectionString(null, config, connectionUri);
-        service = ServiceBusService.create(config);
     }
 
-    public void publish(String id, OptimizationRequestSeas value) throws JAXBException, IOException, ServiceException {
-        // do not show configuration in github !
-        JAXBContext jaxbContext = JAXBContext.newInstance(OptimizationRequestSeas.class);
-        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-        StringWriter valueXMLString = new StringWriter();
-        jaxbMarshaller.marshal(value, valueXMLString);
-        BrokeredMessage message = new BrokeredMessage(valueXMLString.toString());
-        message.setMessageId(id);
-        service.sendQueueMessage(queueName, message);
+    private SOAPMessage createSoapMessage(GetChargingPlans value) throws CNRException {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(GetChargingPlans.class);
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            jaxbContext.createMarshaller().marshal(value, document);
+
+            SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
+            soapMessage.getSOAPBody().addDocument(document);
+            Name headername = soapMessage.getSOAPPart().getEnvelope().createName("Action", "", "http://schemas.microsoft.com/ws/2005/05/addressing/none/");
+            SOAPHeaderElement soapAction = soapMessage.getSOAPHeader().addHeaderElement(headername);
+            soapAction.setMustUnderstand(true);
+            soapAction.setTextContent("http://cnr-seas.cloudapp.net/scp/ISmartCharging/GetChargingPlans");
+            return soapMessage;
+        } catch (DOMException | JAXBException | ParserConfigurationException | SOAPException ex) {
+            throw new CNRException(ex);
+        }
     }
 
 }

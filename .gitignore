@@ -15,3 +15,4 @@ nb-configuration.xml
 
 
 src/main/resources/conf.properties
+/nbproject/

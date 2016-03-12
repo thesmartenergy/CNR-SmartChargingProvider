@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.thesmartenergy.cnr.front;
+package com.thesmartenergy.cnr.rs;
 
-import com.thesmartenergy.cnr.Request;
-import com.thesmartenergy.cnr.RequestController;
-import com.thesmartenergy.cnr.skeleton.ArrayOfKeyValueOfintArrayOfOrderJORfzFnK;
+import com.thesmartenergy.cnr.CNRException;
+import com.thesmartenergy.cnr.entities.Request;
+import com.thesmartenergy.cnr.entities.RequestController;
 import com.thesmartenergy.cnr.skeleton.GetChargingPlansResponse;
-import com.thesmartenergy.cnr.skeleton.OptimizationRequestSeas;
-import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import javax.jws.WebParam;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXB;
-import javax.xml.ws.ResponseWrapper;
 
 /**
  *
@@ -40,33 +36,38 @@ import javax.xml.ws.ResponseWrapper;
 @Path("/ChargingPlan/{requestId}")
 public class ChargingPlan {
 
+    @Inject
+    RequestController controller;
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    @ResponseWrapper(localName = "GetChargingPlansResponse", targetNamespace = "http://cnr-seas.cloudapp.net/scp/", className = "com.thesmartenergy.cnr.scp.service.skeleton.GetChargingPlansResponse")
-    public Response postRequestXml(@WebParam(name = "requestId") String requestId) throws IOException {
-
-        // find Request object
-        RequestController controller = RequestController.get();
-        Request request = controller.find(requestId);
+    public Response postRequestXml(@PathParam("requestId") String requestId) {
+        Request request;
+        try {
+            // find Request object
+            request = controller.find(requestId);
+        } catch (CNRException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error, " + ex.getMessage()).build();
+        }
 
         // check HTTP promise state
         if (request == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("Request " + requestId + " cannot be found on the server").build();
         }
-        if (request.getChargingPlans() == null) {
+        if (request.getGetChargingPlansResponse() == null) {
             Response response = Response.status(Response.Status.ACCEPTED)
-                    .header("X-Promise-Delay", 20000) // the delay (milliseconds) before the response can be accessed
+                    .header("Promise-Delay", 5000) // the delay (milliseconds) before the response can be accessed
                     .entity("Result of request " + requestId + " is not available yet.")
                     .build();
             return response;
         }
-        
+
         // return ChargingPlans in XML
-        ArrayOfKeyValueOfintArrayOfOrderJORfzFnK chargingPlans = request.getChargingPlans();
+        GetChargingPlansResponse chargingPlans = request.getGetChargingPlansResponse();
         StringWriter xml = new StringWriter();
         JAXB.marshal(chargingPlans, xml);
-        
+
         return Response.ok(xml.toString()).build();
     }
 

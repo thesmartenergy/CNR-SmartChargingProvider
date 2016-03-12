@@ -7,8 +7,6 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-
-
     <name>CNR pilot SmartChargingProvider</name>
     <description>The source of CNR Electric Vehicle Smart Charging Provider pilot web API, http://cnr-seas.cloudapp.net/scp/</description>
     <url>http://cnr-seas.cloudapp.net/scp/</url>
@@ -38,43 +36,14 @@
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <jersey.version>2.22.2</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.7</jdk.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
     </properties>
     
-    <profiles>
-        <profile>
-            <!-- Turn of doclint for java8 and later -->
-            <id>doclint-java8-disable</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.3</version>
-                        <configuration>
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    
-    
-    
     <dependencies>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>eclipselink</artifactId>
-            <version>2.5.2</version>
-        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
@@ -82,10 +51,83 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.w3id.spargl</groupId>
-            <artifactId>spargl-jena</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.22.2</version>
+            <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
+            <version>2.22.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>2.4.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.22.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.ext.cdi</groupId>
+            <artifactId>jersey-cdi1x</artifactId>
+            <version>2.22.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.ext.cdi</groupId>
+            <artifactId>jersey-cdi1x-servlet</artifactId>
+            <version>2.22.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.servlet</groupId>
+            <artifactId>weld-servlet</artifactId>
+            <version>2.3.3.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+            <version>2.3.3.Final</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!--        <dependency>
+            <groupId>com.github.thesmartenergy</groupId>
+            <artifactId>sparql-generate-jena</artifactId>
+            <version>0.9</version>
+        </dependency>-->
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-servicebus</artifactId>
@@ -94,34 +136,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <version>true</version>
-                        <show>public</show>
-                        <quiet>true</quiet>
-                        <encoding>UTF-8</encoding>
-                        <windowtitle>${project.name} ${project.version}</windowtitle>
-                        <doctitle>${project.name} ${project.version}</doctitle>
-                        <bottom>Licensed under the Apache License, Version 2.0</bottom>
-                        <links>
-                            <link>http://w3id.org/spargl/spargl-jena/javadoc/</link>
-                        </links>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <!-- Run the RAT Plugin -->
             <plugin>
@@ -146,10 +160,12 @@
                         into generated documentation anyway so no need to put license statements in these
                         files
                         -->
+                        <exclude>nbactions.xml</exclude>
                         <exclude>**/*.xml</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>**/*.wsdl</exclude>
                         <exclude>**/*.jsp</exclude>
+                        <exclude>**/*.xhtml</exclude>
                         <!--
                         Text and Markdown files are typically used only for documentation purposes
                         and license declarations are usually spurious in these files since often they
@@ -177,6 +193,7 @@
                 <executions> 
                     <execution> 
                         <id>wsimport-from-jdk</id> 
+                        <phase>generate-sources</phase>
                         <goals> 
                             <goal>wsimport</goal> 
                         </goals> 
@@ -216,8 +233,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <compilerArguments>
                         <endorseddirs>${endorsed.dir}</endorseddirs>
                     </compilerArguments>

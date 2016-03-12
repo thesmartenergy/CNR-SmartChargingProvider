@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.thesmartenergy.cnr;
+package com.thesmartenergy.cnr.entities;
 
-import com.thesmartenergy.cnr.skeleton.ArrayOfKeyValueOfintArrayOfOrderJORfzFnK;
-import com.thesmartenergy.cnr.skeleton.OptimizationRequestSeas;
+import com.thesmartenergy.cnr.skeleton.GetChargingPlans;
+import com.thesmartenergy.cnr.skeleton.GetChargingPlansResponse;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,28 +39,31 @@ public class Request {
     protected Date requestDate;
     
     @XmlElement(required = true)
-    protected OptimizationRequestSeas optimizationRequestSeas;
+    protected GetChargingPlans getChargingPlans;
     
     @XmlAttribute
     protected Date responseDate;
     
     @XmlElement(required = true)
-    protected ArrayOfKeyValueOfintArrayOfOrderJORfzFnK chargingPlans;
+    protected GetChargingPlansResponse getChargingPlansResponse;
 
 
-    public Request(String id, Date requestDate, OptimizationRequestSeas optimizationRequestSeas) {
+    public Request() {
+    }
+
+    public Request(String id, Date requestDate, GetChargingPlans getChargingPlans) {
         this.id = id;
         this.requestDate = requestDate;
-        this.optimizationRequestSeas = optimizationRequestSeas;
+        this.getChargingPlans = getChargingPlans;
     }
 
 
-    public Request(String id, Date requestDate, OptimizationRequestSeas optimizationRequestSeas, Date responseDate, ArrayOfKeyValueOfintArrayOfOrderJORfzFnK chargingPlans) {
+    public Request(String id, Date requestDate, GetChargingPlans getChargingPlans, Date responseDate, GetChargingPlansResponse getChargingPlansResponse) {
         this.id = id;
         this.requestDate = requestDate;
-        this.optimizationRequestSeas = optimizationRequestSeas;
+        this.getChargingPlans = getChargingPlans;
         this.responseDate = responseDate;
-        this.chargingPlans = chargingPlans;
+        this.getChargingPlansResponse = getChargingPlansResponse;
     }
 
     @Override
@@ -89,16 +92,16 @@ public class Request {
     }
     
 
-    public ArrayOfKeyValueOfintArrayOfOrderJORfzFnK getChargingPlans() {
-        return chargingPlans;
+    public GetChargingPlansResponse getGetChargingPlansResponse() {
+        return getChargingPlansResponse;
     }
 
     public String getId() {
         return id;
     }
 
-    public OptimizationRequestSeas getOptimizationRequestSeas() {
-        return optimizationRequestSeas;
+    public GetChargingPlans getGetChargingPlans() {
+        return getChargingPlans;
     }
 
     public Date getRequestDate() {
@@ -109,5 +112,26 @@ public class Request {
         return responseDate;
     }
 
+    public void setGetChargingPlans(GetChargingPlans getChargingPlans) {
+        this.getChargingPlans = getChargingPlans;
+    }
+
+    public void setGetChargingPlansResponse(GetChargingPlansResponse getChargingPlansResponse) {
+        this.getChargingPlansResponse = getChargingPlansResponse;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setRequestDate(Date requestDate) {
+        this.requestDate = requestDate;
+    }
+
+    public void setResponseDate(Date responseDate) {
+        this.responseDate = responseDate;
+    }
     
+    
+
 }
