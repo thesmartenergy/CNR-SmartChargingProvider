@@ -2,9 +2,9 @@
 
 The source of CNR Electric Vehicle Smart Charging Provider pilot web API, http://cnr-seas.cloudapp.net/scp/
 
-This API defines only two operations. For now, these operations consume or produce XML as described below. In the next release, the operations will also be able to consume or produce RDF, in conformance with the SEAS knowledge model. SPARQL-Generate protocol will be used to describe how RDF may be generated from XML.
+This API defines only two operations. For now, these operations consume or produce XML as described below. In the next release, the operations will also be able to consume or produce RDF, in conformance with the SEAS knowledge model. [SPARQL-Generate protocol](http://thesmartenergy.github.io/sparql-generate-jena) will be used to describe how RDF may be generated from XML.
 
-+ `POST </scp/rest/ChargeOptimizationRequest>`: with HTTP header field `Content-type: application/xml`, and HTTP body represents a charge need (see below, and see the schema in the wsdl file on github). Then the server returns a `202 Accepted`, with HTTP Response field `Location` that describes where the response will be located, and a HTTP Response field `Promise-Delay` that describes the delay (in ms) before the server believes the response will be available.
++ `POST </scp/rest/ChargeOptimizationRequest>`: with HTTP header field `Content-type: application/xml`, and HTTP body represents a charge need (see below, and see the schema in the wsdl file in the `src/main/resource` folder). Then the server returns a `202 Accepted`, with HTTP Response field `Location` that describes where the response will be located, and a HTTP Response field `Promise-Delay` that describes the delay (in ms) before the server believes the response will be available.
 
 ```
 <GetChargingPlans xmlns="http://cnr-seas.cloudapp.net/scp/">
@@ -27,7 +27,7 @@ This API defines only two operations. For now, these operations consume or produ
 </GetChargingPlans>
 ```
 
-+ `GET </scp/ChargingPlan/{id}>`: with HTTP header field `Accept: application/xml`. Then if the server returns a `200 OK`, the HTTP body represents the response charging plan (see below, and see the schema in the wsdl file on github). If the server returns a 202 Accepted, then the server did not finish processing the charge optimization. HTTP Response field `Promise-Delay` describes the delay (in ms) before the server believes the response will be available.
++ `GET </scp/ChargingPlan/{id}>`: with HTTP header field `Accept: application/xml`. Then if the server returns a `200 OK`, the HTTP body represents the response charging plan (see below, and see the schema in the wsdl file `src/main/resource` folder). If the server returns a 202 Accepted, then the server did not finish processing the charge optimization. HTTP Response field `Promise-Delay` describes the delay (in ms) before the server believes the response will be available.
 
 ```
 <ns2:GetChargingPlansResponse xmlns="http://schemas.datacontract.org/2004/07/SIGE.WCF" xmlns:ns2="http://cnr-seas.cloudapp.net/scp/" xmlns:ns3="http://schemas.microsoft.com/2003/10/Serialization/">
