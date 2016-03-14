@@ -164,6 +164,7 @@
                         <exclude>**/*.wsdl</exclude>
                         <exclude>**/*.jsp</exclude>
                         <exclude>**/*.xhtml</exclude>
+                        <exclude>**/*.html</exclude>
                         <!--
                         Text and Markdown files are typically used only for documentation purposes
                         and license declarations are usually spurious in these files since often they

@@ -25,6 +25,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.logging.Logger;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
@@ -36,6 +38,7 @@ import javax.xml.soap.Name;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 
@@ -45,6 +48,9 @@ import org.w3c.dom.Document;
  */
 @Dependent
 public class ChargeOptimizationRequestPublisher {
+
+    @Inject
+    Logger log;
 
     @Inject
     @Publish
@@ -61,7 +67,9 @@ public class ChargeOptimizationRequestPublisher {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             soapMessage.writeTo(out);
             InputStream in = new ByteArrayInputStream(out.toByteArray());
-            BrokeredMessage message = new BrokeredMessage(in);
+            String string = IOUtils.toString(in,Charset.forName("UTF-8"));
+            log.info("sending message: "+string);
+            BrokeredMessage message = new BrokeredMessage(string);
             message.setMessageId(id);
             service.sendQueueMessage(queue, message);
         } catch (CNRException | ServiceException | SOAPException | IOException ex) {

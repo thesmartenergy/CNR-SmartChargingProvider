@@ -79,6 +79,9 @@ public class ChargingPlanSubscriber implements Runnable {
             try {
                 ReceiveQueueMessageResult result = service.receiveQueueMessage(queue, opts);
                 BrokeredMessage message = result.getValue();
+                if(message == null ){
+                    continue;
+                }
 
                 // SCP response
                 String id = message.getMessageId();
