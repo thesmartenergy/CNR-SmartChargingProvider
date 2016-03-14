@@ -31,21 +31,30 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
 
 /**
  *
  * @author maxime.lefrancois
  */
 public class ChargingPlanSubscriber implements Runnable {
-    
+
     final static ReceiveMessageOptions opts = ReceiveMessageOptions.DEFAULT;
+
     static {
         opts.setReceiveMode(ReceiveMode.PEEK_LOCK);
     }
@@ -70,27 +79,51 @@ public class ChargingPlanSubscriber implements Runnable {
             try {
                 ReceiveQueueMessageResult result = service.receiveQueueMessage(queue, opts);
                 BrokeredMessage message = result.getValue();
-                
+
                 // SCP response
                 String id = message.getMessageId();
                 log.info("received response " + id);
                 InputStream body = message.getBody();
+                
+                String bodyAsString = IOUtils.toString(body);
+                
+                log.info("message: " + bodyAsString);
 
                 SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null, body);
 
-                GetChargingPlansResponse response = JAXB.unmarshal(body, GetChargingPlansResponse.class);
+                JAXBContext jaxbContext = JAXBContext.newInstance(GetChargingPlansResponse.class);
+
+                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                Document document = soapMessage.getSOAPBody().extractContentAsDocument();
+
+                // Use a Transformer for output
+                TransformerFactory tFactory
+                        = TransformerFactory.newInstance();
+                Transformer transformer
+                        = tFactory.newTransformer();
+
+                DOMSource source = new DOMSource(document);
+                StreamResult res = new StreamResult(System.out);
+                transformer.transform(source, res);
+
+                GetChargingPlansResponse response = (GetChargingPlansResponse) unmarshaller.unmarshal(document);
 
                 // Delete message from queue
                 service.deleteMessage(message);
                 // Get original request
                 Request request = controller.find(id);
+                request.setResponseDate(new Date());
+                request.setGetChargingPlansResponse(response);
 
-                // Edit request object
-                Request newRequest = new Request(request.getId(), request.getRequestDate(), request.getGetChargingPlans(), new Date(), response);
+                controller.edit(request);
 
-                controller.edit(newRequest);
-
-            } catch (SOAPException | ServiceException | IOException | CNRException | NullPointerException ex) {
+            } catch (SOAPException | IOException | ServiceException | JAXBException | CNRException | NullPointerException ex) {
+                log.warning("error while processing input " + ex);
+                ex.printStackTrace();
+            } catch (TransformerConfigurationException ex) {
+                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TransformerException ex) {
+                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
                 Thread.sleep(200);

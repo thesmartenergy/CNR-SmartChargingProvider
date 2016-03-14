@@ -101,7 +101,7 @@ public class App {
 
     public static void startWorkers() {
         EXECUTOR = Executors.newFixedThreadPool(5);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             BeanManager manager = CDI.current().getBeanManager();
             Bean bean = manager.resolve(manager.getBeans(ChargingPlanSubscriber.class));
             if (bean != null) {

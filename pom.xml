@@ -121,13 +121,11 @@
             <version>2.3.3.Final</version>
             <scope>test</scope>
         </dependency>
-
-
-        <!--        <dependency>
+        <dependency>
             <groupId>com.github.thesmartenergy</groupId>
             <artifactId>sparql-generate-jena</artifactId>
             <version>0.9</version>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-servicebus</artifactId>
