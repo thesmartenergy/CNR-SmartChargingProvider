@@ -28,7 +28,9 @@ import com.thesmartenergy.cnr.entities.RequestController;
 import com.thesmartenergy.cnr.skeleton.GetChargingPlansResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -75,64 +77,59 @@ public class ChargingPlanSubscriber implements Runnable {
 
     @Override
     public void run() {
+        log.info("Starting worker.");
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ReceiveQueueMessageResult result = service.receiveQueueMessage(queue, opts);
                 BrokeredMessage message = result.getValue();
-                if(message == null ){
+                if (message == null) {
                     continue;
                 }
 
                 // SCP response
                 String id = message.getMessageId();
                 log.info("received response " + id);
-                InputStream body = message.getBody();
+                byte[] body = IOUtils.toByteArray(message.getBody());
                 
-                String bodyAsString = IOUtils.toString(body);
+                String bodyAsString = IOUtils.toString(body, "UTF-8");
                 
-                log.info("message: " + bodyAsString);
+                // strangely, string starts with "@strin3http://schemas.microsoft.com/2003/10/Serialization/?f<s:Envelope ..." on this side, 
+                // although it starts with  "<?xml version="1.0" encoding="UTF-8"?> <s:Envelope ..." on the other side
+                // so ... ugly hack
+                bodyAsString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + bodyAsString.substring(64, bodyAsString.length()-1);
 
-                SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null, body);
-
+                SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null, IOUtils.toInputStream(bodyAsString));
                 JAXBContext jaxbContext = JAXBContext.newInstance(GetChargingPlansResponse.class);
 
                 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                 Document document = soapMessage.getSOAPBody().extractContentAsDocument();
-
-                // Use a Transformer for output
-                TransformerFactory tFactory
-                        = TransformerFactory.newInstance();
-                Transformer transformer
-                        = tFactory.newTransformer();
-
-                DOMSource source = new DOMSource(document);
-                StreamResult res = new StreamResult(System.out);
-                transformer.transform(source, res);
-
                 GetChargingPlansResponse response = (GetChargingPlansResponse) unmarshaller.unmarshal(document);
 
-                // Delete message from queue
-                service.deleteMessage(message);
                 // Get original request
-                Request request = controller.find(id);
+                Request request;
+                try {
+                    request = controller.find(id);
+                } catch (CNRException ex) {
+                    request = new Request();
+                    request.setId(id);
+                }
                 request.setResponseDate(new Date());
                 request.setGetChargingPlansResponse(response);
 
                 controller.edit(request);
 
-            } catch (SOAPException | IOException | ServiceException | JAXBException | CNRException | NullPointerException ex) {
-                log.warning("error while processing input " + ex);
-                ex.printStackTrace();
-            } catch (TransformerConfigurationException ex) {
-                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (TransformerException ex) {
-                Logger.getLogger(ChargingPlanSubscriber.class.getName()).log(Level.SEVERE, null, ex);
+                // Delete message from queue
+                service.deleteMessage(message);
+                
+            } catch (ServiceException | IOException | JAXBException | SOAPException | CNRException ex) {
+                log.log(Level.WARNING, "error while processing input ", ex);                
             }
             try {
-                Thread.sleep(200);
+                Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }
+        log.info("Stopping worker.");
     }
 }

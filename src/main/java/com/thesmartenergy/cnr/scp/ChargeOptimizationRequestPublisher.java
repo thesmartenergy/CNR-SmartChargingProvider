@@ -88,7 +88,7 @@ public class ChargeOptimizationRequestPublisher {
             Name headername = soapMessage.getSOAPPart().getEnvelope().createName("Action", "", "http://schemas.microsoft.com/ws/2005/05/addressing/none/");
             SOAPHeaderElement soapAction = soapMessage.getSOAPHeader().addHeaderElement(headername);
             soapAction.setMustUnderstand(true);
-            soapAction.setTextContent("http://cnr-seas.cloudapp.net/scp/ISmartCharging/GetChargingPlans");
+            soapAction.setTextContent("http://tempuri.org/ISmartCharging/GetChargingPlans");
             return soapMessage;
         } catch (DOMException | JAXBException | ParserConfigurationException | SOAPException ex) {
             throw new CNRException(ex);

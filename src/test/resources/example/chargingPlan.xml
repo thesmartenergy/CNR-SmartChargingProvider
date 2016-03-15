@@ -1,7 +1,7 @@
 <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
   <s:Header />
   <s:Body>
-    <GetChargingPlansResponse xmlns="http://cnr-seas.cloudapp.net/scp/">
+    <GetChargingPlansResponse xmlns="http://tempuri.org/">
       <GetChargingPlansResult xmlns:a="http://schemas.datacontract.org/2004/07/SIGE.WCF" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
         <a:ChargingPlan>
           <a:IdCharge>1</a:IdCharge>

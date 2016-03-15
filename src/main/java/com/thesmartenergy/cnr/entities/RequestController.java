@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.xml.bind.JAXB;
 
@@ -32,7 +32,7 @@ import javax.xml.bind.JAXB;
  *
  * @author maxime.lefrancois
  */
-@RequestScoped
+@Dependent
 public class RequestController {
 
     @Inject

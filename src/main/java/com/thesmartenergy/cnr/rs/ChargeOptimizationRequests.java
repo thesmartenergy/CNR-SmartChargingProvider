@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response.Status;
  * accepts XML or Turtle requests it processes the request and transfers it to
  * the CNR.
  *
- * in the meantime, it returns a HTTP 205 Promise code to the client, with the
+ * in the meantime, it returns a HTTP 202 Accepted code to the client, with the
  * location where the client will be able to retrieve the answer, and the delay
  * before the client will be able to retrieve the answer
  *
@@ -87,12 +87,12 @@ public class ChargeOptimizationRequests {
         } catch (CNRException | URISyntaxException ex) {
             log.log(Level.SEVERE, null, ex);
             return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error, " + ex.getMessage()).build();
-        }
+        }   
     }
 
     public Response respondPromise(String requestId) throws URISyntaxException {
         Response response = Response.status(Status.ACCEPTED)
-                .contentLocation(new URI("http://cnr-seas.cloudapp.net/scp/ChargingPlan/" + requestId))
+                .contentLocation(new URI("http://cnr-seas.cloudapp.net/scp/rest/ChargingPlan/" + requestId))
                 .header("Promise-Delay", 5000) // the delay (milliseconds) before the response can be accessed
                 .build();
         return response;
