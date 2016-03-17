@@ -14,19 +14,58 @@
     
     <developers>
         <developer>
-            <name>Maxime Lefran�ois</name>
+            <name>Maxime Lefrançois</name>            
             <email>maxime.lefrancois.86@gmail.com</email>
             <url>http://maxime-lefrancois.info/</url>
             <organization>Ecole des mines de Saint-Etienne</organization>
             <organizationUrl>http://www.mines-stetienne.fr/</organizationUrl>
+            <timezone>UTC+01:00</timezone>
+            <properties>
+                <picUrl>http://0.gravatar.com/userimage/102097381/dac8aeb15edac9a93e09a7974743957f</picUrl>
+            </properties>        
+        </developer>
+        <developer>
+            <name>Eric Françon</name>
+            <email>E.Francon@cnr.tm.fr</email>
+            <url>http://fr.viadeo.com/fr/profile/eric.francon</url>
+            <organization>CNR - Compagnie Nationale du Rhône</organization>
+            <organizationUrl>http://www.cnr.tm.fr/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Nadjib Benzine</name>
+            <email>n.benzine@cnr.tm.fr</email>
+            <url>https://www.linkedin.com/in/nadjib-benzine-9239b795</url>
+            <organization>CNR - Compagnie Nationale du Rhône</organization>
+            <organizationUrl>http://www.cnr.tm.fr/</organizationUrl>
         </developer>
     </developers>
-
+    <contributors>
+        <contributor>
+            <name>Caroline Ramondou</name>
+            <email>c.ramondou@cnr.tm.fr</email>
+            <url>https://www.linkedin.com/in/caroline-ramondou-b558963b</url>
+            <organization>CNR - Compagnie Nationale du Rhône</organization>
+            <organizationUrl>http://www.cnr.tm.fr/</organizationUrl>
+        </contributor>
+        <contributor>
+            <name>Guillaume Habault</name>
+            <email>guillaume.habault@telecom-bretagne.eu</email>
+            <url>https://fr.linkedin.com/in/guillaume-habault-62171023/fr</url>
+            <organization>Télécom Bretagne</organization>
+            <organizationUrl>http://www.telecom-bretagne.eu/</organizationUrl>
+        </contributor>
+    </contributors>
+    
     <organization>
         <name>ITEA 12004 SEAS Project</name>
         <url>https://itea3.org/project/seas.html</url>
     </organization>
 
+    <issueManagement>
+        <url>http://${repository.domain}/${repository.user}/${repository.name}/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+    
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -41,6 +80,9 @@
         <jdk.version>1.7</jdk.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <repository.domain>github.com</repository.domain>
+        <repository.user>thesmartenergy</repository.user>
+        <repository.name>CNR-SmartChargingProvider</repository.name>
     </properties>
     
     <dependencies>
@@ -134,6 +176,49 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!-- ========================  -->
+                <!--    SITE LIFECYCLE         -->
+                <!-- ========================  -->
+
+                <!-- configure attach-descriptor  -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.5</version>
+                    <inherited>true</inherited>
+                    <executions>
+                        <execution>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>site</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <attach>true</attach>
+                        <outputDirectory>target\${project.build.finalName}</outputDirectory>
+                        <reportPlugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-project-info-reports-plugin</artifactId>
+                                <configuration>
+                                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                                </configuration>
+                                <reports>
+                                    <report>summary</report>
+                                    <report>issue-tracking</report>
+                                    <report>license</report>
+                                    <report>project-team</report>
+                                </reports>
+                            </plugin>
+                        </reportPlugins>
+                    </configuration>        
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <!-- Run the RAT Plugin -->
             <plugin>
@@ -271,6 +356,15 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>            
+            <!-- ========================  -->
+            <!--    SITE LIFECYCLE         -->
+            <!-- ========================  -->
+
+            <!-- attach-descriptor  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
