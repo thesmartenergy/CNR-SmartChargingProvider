@@ -15,7 +15,7 @@
     <developers>
         <developer>
             <name>Maxime Lefrançois</name>            
-            <email>maxime.lefrancois.86@gmail.com</email>
+            <email>maxime.lefrancois@emse.fr</email>
             <url>http://maxime-lefrancois.info/</url>
             <organization>Ecole des mines de Saint-Etienne</organization>
             <organizationUrl>http://www.mines-stetienne.fr/</organizationUrl>
@@ -37,6 +37,9 @@
             <url>https://www.linkedin.com/in/nadjib-benzine-9239b795</url>
             <organization>CNR - Compagnie Nationale du Rhône</organization>
             <organizationUrl>http://www.cnr.tm.fr/</organizationUrl>
+            <properties>
+                <picUrl>http://1.gravatar.com/avatar/4a0c00ff47855863be889066f112acf9</picUrl>
+            </properties>        
         </developer>
     </developers>
     <contributors>
@@ -166,7 +169,7 @@
         <dependency>
             <groupId>com.github.thesmartenergy</groupId>
             <artifactId>sparql-generate-jena</artifactId>
-            <version>0.9</version>
+            <version>0.11-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
@@ -176,6 +179,7 @@
     </dependencies>
 
     <build>
+        <finalName>scp</finalName>
         <pluginManagement>
             <plugins>
                 <!-- ========================  -->
@@ -247,6 +251,7 @@
                         <exclude>**/*.xml</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>**/*.wsdl</exclude>
+                        <exclude>**/*.js</exclude>
                         <exclude>**/*.jsp</exclude>
                         <exclude>**/*.xhtml</exclude>
                         <exclude>**/*.html</exclude>

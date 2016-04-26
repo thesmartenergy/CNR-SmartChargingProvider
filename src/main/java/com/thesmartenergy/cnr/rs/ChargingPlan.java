@@ -68,7 +68,9 @@ public class ChargingPlan {
         StringWriter xml = new StringWriter();
         JAXB.marshal(chargingPlans, xml);
 
-        return Response.ok(xml.toString()).build();
+        return Response.ok(xml.toString())
+                .header("Link", "<http://cnr-seas.cloudapp.net/scp/query/ChargingPlan>; rel=\"spargl-query\"; var=\"message\"")
+                .build();
     }
 
 }

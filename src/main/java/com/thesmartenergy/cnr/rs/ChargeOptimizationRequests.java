@@ -63,10 +63,10 @@ public class ChargeOptimizationRequests {
     @Inject
     File dir;
     
-    @HeaderParam("SPARQL-Generate-Uri")
+    @HeaderParam("SPARGL-Query")
     String sparqlGenerateUri;
 
-    @HeaderParam("SPARQL-Generate-Variable")
+    @HeaderParam("SPARGL-Variable")
     String sparqlGenerateVariable;
 
     @POST

@@ -28,7 +28,7 @@ Node: **CNR-SmartChargingProvider**
 | **expected message content:** | The charge need. | 
 | **preferred format:** | XML document satisfying object GetChargingPlans in xsd schema http://bit.ly/1RZms6O | 
 | **alternative format:** | RDF (Turtle, or RDF/XML, or JSON-LD, ...)  document satisfying whatever ontology is to be used | 
-| **then sends back response:** | The location where the result of the algorithm execution will be available, which is a IRI of the  form `<ChargingPlan/{id}>`, where id is some string like `qsdf13s5f4az3ef3584fezf` | 
+| **then sends back response:** | The location where the result of the algorithm execution will be available, which is a IRI of the  form `<rest/ChargingPlan/{id}>`, where id is some string like `1fc4ltccsrsun9mdijrgaruhe5` | 
 
 ## Description of interaction 2:
 
@@ -38,7 +38,7 @@ Node: **CNR-SmartChargingProvider**
 | ------------- |:-------------:|
 | **with:** | any Client |
 | **processes requests for some:** | information |
-| **about/on resource:** | the `ChargingPlan/{id}`, with `id` is some string like `qsdf13s5f4az3ef3584fezf` | 
+| **about/on resource:** | the `rest/ChargingPlan/{id}`, with `id` is some string like `1fc4ltccsrsun9mdijrgaruhe5` | 
 | **expected message content:** | void, as one just requests information. |
 | **then sends back response:** | The optimized charge plan |
 | **preferred format:** | XML document satisfying object GetChargingPlansResponse in xsd schema http://bit.ly/1RZms6O |

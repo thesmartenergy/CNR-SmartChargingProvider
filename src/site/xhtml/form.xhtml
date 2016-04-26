@@ -1,0 +1,33 @@
+<div id="bodyColumn"  class="span10">
+
+    <script  src="form.js"/>
+   
+
+    <h1>Send a Request to the CNR Smart Charging Provider</h1>
+    <p>Modify the query, then click on <strong>send</strong> to request for the algorithm execution.</p>
+    <label for="message">Enter the request, or <input type="button" onclick="resetForm1()" value="use the default"/>:</label>
+    <textarea cols="100" rows="20" style="min-width:80%;height:45em" id="message" name="message"></textarea><br/>
+
+    <button type="button" onclick="requestExecution()">Send</button>
+
+<p><strong>Result:</strong> <span id="msg"></span></p>
+
+    <h1>Fetch a response of the CNR Smart Charging Provider</h1>
+    <p>Select a request identifier, then click on <strong>Get</strong> to fetch the algorithm execution result</p>
+    
+    <label for="uri">Select a request identifier and the requested media type for the result, or <input type="button" onclick="resetForm2()" value="use the default"/>:</label>
+    http://cnr-seas.cloudapp.net/scp/rest/ChargingPlan/<input type="text" size="23" id="rqid"></input>
+    
+    <label for="accept">Enter the requested response media type</label>
+    <select id="accept" name="accept">
+        <option value="application/xml">XML</option>
+<!--        <option value="text/turtle">Turtle</option>
+        <option value="application/rdf+xml">RDF/XML</option>-->
+    </select>
+    <div>
+        <button type="button" onclick="get()">Get</button>
+    </div>
+
+    <p><strong>Result:</strong> <span id="msg2"></span></p>
+    <pre id="pre"></pre>
+</div>
