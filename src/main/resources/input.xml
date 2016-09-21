@@ -1,0 +1,43 @@
+<!-- Copyright 2016 ITEA 12004 SEAS Project.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing, 
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.-->
+
+<GetChargingPlans xmlns="http://tempuri.org/" xmlns:s="http://schemas.datacontract.org/2004/07/SIGE.WCF">
+    <value>
+        <s:ChargeNeeds>
+            <s:ChargeNeed>
+                <s:DateReprise>2016-08-03T18:05:10.659Z</s:DateReprise>
+                <s:Energie>14</s:Energie>
+                <s:IdCharge>1</s:IdCharge>
+                <s:MargeDuree>0.0</s:MargeDuree>
+                <s:MargeEnergie>0.0</s:MargeEnergie>
+                <s:PMax>4.0</s:PMax>
+                <s:PMin>3.0</s:PMin>
+                <s:Priorite>0</s:Priorite>
+                <s:TypeCharge>Planifiee</s:TypeCharge>
+            </s:ChargeNeed>
+            <s:ChargeNeed>
+                <s:DateReprise>2016-08-03T21:05:10.659Z</s:DateReprise>
+                <s:Energie>10</s:Energie>
+                <s:IdCharge>2</s:IdCharge>
+                <s:MargeDuree>0.0</s:MargeDuree>
+                <s:MargeEnergie>0.0</s:MargeEnergie>
+                <s:PMax>4.0</s:PMax>
+                <s:PMin>3.0</s:PMin>
+                <s:Priorite>0</s:Priorite>
+                <s:TypeCharge>Planifiee</s:TypeCharge>
+            </s:ChargeNeed>
+        </s:ChargeNeeds>
+        <s:OptimisationPmaxSite>7.0</s:OptimisationPmaxSite>
+    </value>
+</GetChargingPlans>

@@ -1,0 +1,101 @@
+<!-- Copyright 2016 ITEA 12004 SEAS Project.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing, 
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns="http://ns.inria.fr/edelweiss/2011/rule#"
+xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+  <rule><body><![CDATA[
+    # generates the body of the XML message
+    # starting point, called once.
+    PREFIX seas: <https://w3id.org/seas/> 
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+    PREFIX owl: <http://www.w3.org/2002/07/owl#> 
+    PREFIX st: <http://ns.inria.fr/sparql-template/>
+    PREFIX cnr: <http://cnr-seas.cloudapp.net/scp/vocab#> 
+    TEMPLATE st:start {
+     "<?xml version='1.0' encoding='UTF-8'?> \n"
+     "<GetChargingPlans xmlns=\"http://tempuri.org/\" xmlns:s=\"http://schemas.datacontract.org/2004/07/SIGE.WCF\">\n"
+     " <value>\n"
+     "  <s:ChargeNeeds>\n"
+     st:call-template(<http://cnr-seas.cloudapp.net/scp/template/printChargeNeed>)
+     "  </s:ChargeNeeds>\n"
+     st:call-template(<http://cnr-seas.cloudapp.net/scp/template/printPMax>)
+     " </value> \n"
+     "</GetChargingPlans>"
+    }
+    WHERE { }
+  ]]></body></rule>
+  <rule><body><![CDATA[
+    # generates s:OptimisationPmaxSite element
+    PREFIX seas: <https://w3id.org/seas/> 
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+    PREFIX owl: <http://www.w3.org/2002/07/owl#> 
+    PREFIX st: <http://ns.inria.fr/sparql-template/>
+    PREFIX cnr: <http://cnr-seas.cloudapp.net/scp/vocab#> 
+    TEMPLATE <http://cnr-seas.cloudapp.net/scp/template/printPMax> {
+     "<s:OptimisationPmaxSite>" str(?pmax) "</s:OptimisationPmaxSite>\n"
+    }
+    WHERE { 
+        [] a seas:ElectricVehicleChargingStationPool ;
+          seas:consumedElectricPower [ 
+            seas:evaluation [
+              seas:evaluatedValue ?pmaxlit ;
+              seas:interpretedAs seas:op-Maximum-Continuous-Rating ] ] .
+      BIND( STRBEFORE(STR(?pmaxlit), " ") AS ?pmax )
+  }
+  ]]></body></rule>
+  <rule><body><![CDATA[
+    # generates s:ChargeNeed element
+    PREFIX seas: <https://w3id.org/seas/> 
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+    PREFIX owl: <http://www.w3.org/2002/07/owl#> 
+    PREFIX st: <http://ns.inria.fr/sparql-template/>
+    PREFIX cnr: <http://cnr-seas.cloudapp.net/scp/vocab#> 
+    PREFIX time: <http://www.w3.org/2006/time#>
+    TEMPLATE <http://cnr-seas.cloudapp.net/scp/template/printChargeNeed> {
+     "  <s:ChargeNeed>\n"
+     "   <s:DateReprise>" str(?returnDate) "</s:DateReprise>\n"
+     "   <s:Energie>" str(?energy) "</s:Energie>\n"
+     "   <s:IdCharge>" str(?id) "</s:IdCharge>\n"
+     "   <s:MargeDuree>" str(?durationMargin) "</s:MargeDuree>\n"
+     "   <s:MargeEnergie>" str(?energyMargin) "</s:MargeEnergie>\n"
+     "   <s:PMax>" str(?pmax) "</s:PMax>\n"
+     "   <s:PMin>" str(?pmin) "</s:PMin>\n"
+     "   <s:Priorite>" str(?priority) "</s:Priorite>\n"
+     "   <s:TypeCharge>Planifiee</s:TypeCharge>\n"
+     "</s:ChargeNeed>\n"
+    }
+    WHERE { 
+        ?station a seas:ElectricVehicleChargingStation ;
+          cnr:priority ?priority ;
+          seas:consumedElectricPower [ 
+            seas:evaluation [ seas:evaluatedValue ?pmin_ucum ; seas:interpretedAs seas:op-Min ] ;
+            seas:evaluation [ seas:evaluatedValue ?pmax_ucum ; seas:interpretedAs seas:op-Maximum-Continuous-Rating ] ;
+            seas:evaluation [
+                a cnr:PlannedChargeEvaluation ;
+                cnr:durationMargin ?durationMargin ;
+                cnr:energyMargin ?energyMargin ;
+                seas:temporalContext [ a time:Interval ; time:hasEnd [ time:inXSDDateTime ?returnDate ] ] ;
+                seas:evaluatedValue ?energy_ucum ;
+                seas:interpretedAs seas:ts-Sum ] ] .
+      BIND( STRAFTER(STR(?station), "station/") AS ?id )
+      BIND( STRBEFORE(STR(?pmin_ucum), " ") AS ?pmin )
+      BIND( STRBEFORE(STR(?pmax_ucum), " ") AS ?pmax )
+      BIND( STRBEFORE(STR(?energy_ucum), " ") AS ?energy )
+   }
+  ]]></body></rule>
+</rdf:RDF>

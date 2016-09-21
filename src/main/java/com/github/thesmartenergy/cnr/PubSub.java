@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.thesmartenergy.cnr;
+package com.github.thesmartenergy.cnr;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.inject.Qualifier;
 
 /**
  *
  * @author maxime.lefrancois
  */
-public class CNRException extends Exception {
-
-    public CNRException() {
-    }
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface PubSub {
     
-    public CNRException(String message) {
-        super(message);
-    }
+    PubSub.Type value();
     
-    public CNRException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    
-    public CNRException(Throwable cause) {
-        super(cause);
+    enum Type {
+        PUBLISH, SUBSCRIBE;
     }
     
 }

@@ -1,6 +1,6 @@
 # API use example
 
-This API defines only two operations, as described [here](index.html). 
+This RESTful API exposes only one Resource container, as described [here](index.html). 
 
 It is planed that the Server will to consume requests with any Content-Type, provided that the Client uses the [SPARQL-Generate](http://w3id.org/sparql-generate/) Protocol. This Protocol gives the Server the opportunity to `interpret` the content as an [RDF Graph](https://www.w3.org/TR/rdf11-concepts/#section-rdf-graph). The RDF Graph interpretation of the content needs to be conformant with the Electric Vocabulary of the [Multidimensional Quantity Ontology](http://w3id.org/multidimensional-quantity/), and the SEAS Knowledge Model.
 

@@ -40,7 +40,7 @@ function get() {
     accept = document.getElementById("accept").value;
     var req = new XMLHttpRequest();
     req.open('GET', 'rest/ChargingPlan/' + id, true); 
-    req.setRequestHeader("Content-Type", accept );
+    req.setRequestHeader("Accept", accept );
     req.onreadystatechange = function (aEvt) {
         if (req.readyState === 4) {
             if(req.status === 200) {
@@ -48,7 +48,7 @@ function get() {
                 if(accept === "application/xml") {
                     document.getElementById("msg2").innerHTML = "You can also request a \n\
 <a href=\"http://w3id.org/sparql-generate/protocol.html\">SPARQL-Generate Client</a> to interpret this response as RDF for you. \n\
-<a href=\"http://w3id.org/sparql-generate/api/fetch?uri=" + encodeURIComponent("http://cnr-seas.cloudapp.net/scp/ChargingPlan/" + id)
+<a href=\"http://w3id.org/sparql-generate/api/fetch?uri=" + encodeURIComponent("http://cnr-seas.cloudapp.net/scp/rest/ChargingPlan/" + id)
                             + "&accept=" + encodeURIComponent("text/turtle") + "&useaccept=" +encodeURIComponent("application/xml") +"\">Click here for a demo</a>.";
                 }
                 document.getElementById("pre").textContent = req.response;
